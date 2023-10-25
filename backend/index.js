@@ -22,13 +22,13 @@ try {
     app.use(bodyParser.json());
 
     app.get('/api', (req, res) => {
-    res.send('Hello API!');
+        res.send('Hello API!');
     });
 
     app.use(express.static('./frontend/dist'));
 
     app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+        console.log(`Example app listening on port ${port}`);
     });
 
 } catch(e) {
