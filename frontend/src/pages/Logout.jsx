@@ -1,8 +1,9 @@
+import { Navigate } from "react-router-dom";
+
 function Logout() {
+  // TODO: remove access tokens
   return (
-    <>
-      TODO: Do logout...
-    </>
+    <Navigate to="/login" replace={true} />
   );
 }
 

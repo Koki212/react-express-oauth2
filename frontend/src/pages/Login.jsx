@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Button, Card, CardActions, CardContent, FormControl, TextField, Typography } from '@mui/material';
+import { Button, CardActions, CardContent, FormControl, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { post } from '../helpers/api.js';
@@ -23,7 +23,7 @@ function Login() {
       return;
     }
 
-    // we send a post request with email and password using our own post function (see api.js), make sure to await it!
+    // we send a post request with email and password using our own post function (see helpers/api.js), make sure to await it!
     const response = await post(
       '/auth/token',
       {
@@ -44,53 +44,51 @@ function Login() {
 
   // render login form
   return (
-    <div className="background">
-      <Card sx={{ maxWidth: 345 }} elevation={5}>
-        <CardContent>
-          <Typography gutterBottom variant="h5">
-            Sign In
-          </Typography>
-          <FormControl fullWidth sx={{ marginBottom: '16px' }}>
-            <TextField
-              required
-              label="E-Mail"
-              type="email"
-              value={email}
-              onChange={(event) => {
-                setEmail(event.target.value);
-                setError('');
-              }}
-            />
-          </FormControl>
-          <FormControl fullWidth>
-            <TextField
-              required
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(event) => {
-                setPassword(event.target.value);
-                setError('');
-              }}
-            />
-          </FormControl>
-          <Typography variant="caption" color="error.main" sx={{ marginBottom: '10px', marginTop: '6px', display: 'inline-block', width: '100%' }}>
-            { error }
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <span>Don't have an account yet?</span><br/>
-            <NavLink
-              to="/register"
-            >
-              Register now.
-            </NavLink>
-          </Typography>
-        </CardContent>
-        <CardActions>
-          <Button onClick={submit}>Login</Button>
-        </CardActions>
-      </Card>
-    </div>
+    <>
+      <CardContent>
+        <Typography gutterBottom variant="h5">
+          Sign In
+        </Typography>
+        <FormControl fullWidth sx={{ marginBottom: '16px' }}>
+          <TextField
+            required
+            label="E-Mail"
+            type="email"
+            value={email}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setError('');
+            }}
+          />
+        </FormControl>
+        <FormControl fullWidth>
+          <TextField
+            required
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(event) => {
+              setPassword(event.target.value);
+              setError('');
+            }}
+          />
+        </FormControl>
+        <Typography variant="caption" color="error.main" sx={{ marginBottom: '10px', marginTop: '6px', display: 'inline-block', width: '100%' }}>
+          { error }
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <span>Don't have an account yet?</span><br/>
+          <NavLink
+            to="/register"
+          >
+            Register now.
+          </NavLink>
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Button onClick={submit}>Login</Button>
+      </CardActions>
+    </>
   );
 }
 

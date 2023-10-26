@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import path from 'path';
 import { fileURLToPath } from 'url';
 // jwt: https://github.com/auth0/node-jsonwebtoken - to create access tokens
@@ -42,7 +42,7 @@ try {
 
 
 
-  // logging middleware - remove for production use, it will log passwords!
+  // logging middleware - TODO: remove for production use, it will log passwords in plaintext!
   app.use((req, res, next) => {
     console.log(`\n${req.method} - ${req.path}\n\tHeaders:\n\t\t${JSON.stringify(req.headers)}\n\tBody:\n\t\t${JSON.stringify(req.body)}`);
     next();
@@ -53,13 +53,13 @@ try {
   // Authentication endpoints
 
   // auth token endpoint for login and token exchange
-  app.post('/api/auth/token', (req, res) => {
+  app.post('/api/auth/token', async (req, res) => {
     // TODO: handle token requests
     res.status(500).json({ message: 'Not yet implemented!' });
   });
 
   // auth register endpoint for user creation
-  app.post('/api/auth/register', (req, res) => {
+  app.post('/api/auth/register', async (req, res) => {
     // TODO: handle register requests
     res.status(500).json({ message: 'Not yet implemented!' });
   });
@@ -71,36 +71,64 @@ try {
   }
 
 
-  // ToDo Endpoints - TODO: make sure user is authenticated and only accesses his own data
+  // ToDo Endpoints
 
   // get all ToDos
-  app.get('/api/todos', (req, res) => {
-    // TODO: handle token requests
-    res.status(500).json({ message: 'Not yet implemented!' });
+  app.get('/api/todos', async (req, res) => { // TODO: make sure user is authenticated and only accesses his own data
+    const toDos = await colToDos.find().toArray();
+    res.status(200).json(toDos);
   });
 
   // get one ToDo
-  app.get('/api/todos/:id', (req, res) => {
-    // TODO: handle token requests
-    res.status(500).json({ message: 'Not yet implemented!' });
+  app.get('/api/todos/:id', async (req, res) => { // TODO: make sure user is authenticated and only accesses his own data
+    const toDo = await colToDos.findOne({ _id: new ObjectId(req.params.id) });
+    if (toDo) {
+      res.status(200).json(toDo);
+    } else {
+      res.status(404).send();
+    }
   });
 
   // add a ToDo
-  app.post('/api/todos/', (req, res) => {
-    // TODO: handle token requests
-    res.status(500).json({ message: 'Not yet implemented!' });
+  app.post('/api/todos/', async (req, res) => { // TODO: make sure user is authenticated and only accesses his own data
+    const insertion = await colToDos.insertOne(req.body);
+    if (insertion.acknowledged) {
+      const toDo = await colToDos.findOne({ _id: insertion.insertedId });
+      if (toDo) {
+        res.status(200).json(toDo);
+      } else {
+        res.status(404).send();
+      }
+    } else {
+      res.status(500).json({ message: 'An error occurred!' });
+    }
   });
 
   // update a ToDo
-  app.put('/api/todos/:id', (req, res) => {
-    // TODO: handle token requests
-    res.status(500).json({ message: 'Not yet implemented!' });
+  app.put('/api/todos/:id', async (req, res) => { // TODO: make sure user is authenticated and only accesses his own data
+    const updateData = req.body;
+    delete updateData._id;
+    const updated = await colToDos.updateOne({ _id: new ObjectId(req.params.id) }, { $set: updateData });
+    if (updated.modifiedCount === 1) {
+      const toDo = await colToDos.findOne({ _id: new ObjectId(req.params.id) });
+      if (toDo) {
+        res.status(200).json(toDo);
+      } else {
+        res.status(404).send();
+      }
+    } else {
+      res.status(404).send();
+    }
   });
 
   // delete a ToDo
-  app.delete('/api/todos/:id', (req, res) => {
-    // TODO: handle token requests
-    res.status(500).json({ message: 'Not yet implemented!' });
+  app.delete('/api/todos/:id', async (req, res) => { // TODO: make sure user is authenticated and only accesses his own data
+    const deleted = await colToDos.deleteOne({ _id: new ObjectId(req.params.id) });
+    if (deleted.deletedCount === 1) {
+      res.status(200).json({});
+    } else {
+      res.status(404).send();
+    }
   });
 
 

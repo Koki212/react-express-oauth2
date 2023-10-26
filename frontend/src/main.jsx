@@ -12,9 +12,11 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 // Import pages we might route to
+import Master from './pages/Master.jsx';
 import ToDos from './pages/ToDos.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import Logout from './pages/Logout.jsx';
 
 // Import global styles
 import './styles.css';
@@ -22,20 +24,26 @@ import './styles.css';
 // Create router
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <ToDos />, // TODO: prevent opening ToDos component when not logged in
-  },
-  {
-    path: "/login",
-    element: <Login />, // TODO: when logged in already, navigate to ToDos
-  },
-  {
-    path: "/register",
-    element: <Register />, // TODO: when logged in already, navigate to ToDos
-  },
-  {
-    path: "/logout",
-    element: <div />, // TODO: logout user and navigate to Login
+    path: '/',
+    element: <Master />, // The master component wraps all it's child pages, it draws the background and Card component
+    children: [
+      {
+        index: true,
+        element: <ToDos />, // TODO: prevent opening ToDos component when not logged in
+      },
+      {
+        path: 'login',
+        element: <Login />, // TODO: when logged in already, navigate to ToDos
+      },
+      {
+        path: 'register',
+        element: <Register />, // TODO: when logged in already, navigate to ToDos
+      },
+      {
+        path: 'logout',
+        element: <Logout />, // TODO: logout user and navigate to Login
+      },
+    ],
   },
 ]);
 

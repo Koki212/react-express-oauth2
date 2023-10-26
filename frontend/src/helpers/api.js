@@ -26,36 +26,21 @@ export default async function request(resource, method = 'GET', data = {}, authe
 
   // TODO: handle auth expired
 
-  try {
-    // send request
-    const response = await fetch(url, {
-      method,
-      headers,
-      body,
-    });
+  // send request
+  const response = await fetch(url, {
+    method,
+    headers,
+    body,
+  });
 
-    // check status and parse response data
-    if (response.status >= 200 && response.status < 300) {
-      const result = await response.json();
-      return {
-        data: result,
-        status: response.status,
-      };
-    }
-
-    // just return status if status was not ok
-    return {
-      data: null,
-      status: response.status,
-    }
-  } catch(err) {
-    console.error(err);
-    // if something strange happens, we return a status 500
-    return {
-      data: null,
-      status: 500,
-    }
+  // check status and parse response data
+  if (response.status >= 200 && response.status < 300) {
+    const result = await response.json();
+    return result;
   }
+
+  // just throw an error if status was not ok
+  throw new Error(`Server responded with Status ${response.status}`);
 }
 
 export function get(resource, authenticated = true) {
