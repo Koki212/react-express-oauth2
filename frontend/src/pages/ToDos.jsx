@@ -13,11 +13,11 @@ function ToDos() {
   const [toDos, setToDos] = useState([]);
   const [lastChanged, setLastChanged] = useState(Date.now());
 
+  // the effect loads ToDos from the server. It loads data again, when the value of `lastChanged` changes
   useEffect(() => {
     const loadData = async () => {
       try {
         const data = await get('/todos');
-        console.log('GOT DATA', data);
         setToDos(data);
       } catch (err) {
         console.error(err);
@@ -28,10 +28,12 @@ function ToDos() {
     loadData();
   }, [lastChanged]);
 
+  // logout click handler, just navigate to logout page
   const logout = () => {
     navigate('/logout');
   };
 
+  // when drawer is closed. `changed` parameter tells us if a ToDo was changed
   const closeDrawer = (changed) => {
     if (changed) {
       setLastChanged(Date.now());
@@ -40,6 +42,7 @@ function ToDos() {
     setSelectedItem(null);
   }
 
+  // Render ToDos List
   return (
     <>
       <CardHeader
@@ -50,7 +53,7 @@ function ToDos() {
       />
       <CardContent sx={{ minWidth: '500px', height: 'calc(80vh - 104px)', overflow: 'auto' }}>
         <List>
-          { toDos.map((toDo) => (
+          { toDos.map((toDo) => ( // iterate over ToDos and display them (by mapping each ToDo to a ListItem element)
             <ListItem
               key={toDo._id}
               disablePadding
@@ -59,6 +62,7 @@ function ToDos() {
                   edge="end"
                   aria-label="delete"
                   onClick={async () => {
+                    // delete button click handler
                     try {
                       await del(`/todos/${toDo._id}`);
                     } catch (err) {
@@ -73,6 +77,7 @@ function ToDos() {
             >
               <ListItemButton
                 onClick={() => {
+                  // list item click handler
                   setSelectedItem(toDo._id);
                   setDrawerOpen(true);
                 }}
@@ -82,11 +87,12 @@ function ToDos() {
             </ListItem>
           ))}
         </List>
-        { toDos.length ? <Divider /> : <></>}
+        { toDos.length ? <Divider /> : <></> }
         <List>
           <ListItem disablePadding>
             <ListItemButton
                 onClick={() => {
+                  // add item click handler
                   setSelectedItem(null);
                   setDrawerOpen(true);
                 }}
@@ -101,7 +107,7 @@ function ToDos() {
       </CardContent>
       <ToDo
         open={drawerOpen}
-        id={selectedItem}
+        selectedItem={selectedItem}
         onClose={closeDrawer}
       />
     </>

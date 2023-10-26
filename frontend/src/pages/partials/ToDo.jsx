@@ -3,16 +3,17 @@ import PropTypes from 'prop-types';
 import { useEffect, useState } from "react";
 import { del, get, post, put } from "../../helpers/api";
 
-function ToDo({ open, id, onClose }) {
+function ToDo({ open, selectedItem, onClose }) {
   const [toDo, setToDo] = useState({
     title: '',
   });
 
+  // the effect loads the selected ToDo (if given), or prepares a new empty ToDo, whenever the dialog is opened or the selectedItem changes
   useEffect(() => {
     const loadData = async () => {
-      if (open && id) {
+      if (open && selectedItem) {
         try {
-          const toDo = await get(`/todos/${id}`);
+          const toDo = await get(`/todos/${selectedItem}`);
           setToDo(toDo);
         } catch (err) {
           console.error(err);
@@ -28,12 +29,14 @@ function ToDo({ open, id, onClose }) {
     };
 
     loadData();
-  }, [open, id]);
+  }, [open, selectedItem]);
 
+  // when cancel is clicked or user clicks away (Drawer onClose)
   const cancel = () => {
     onClose(false);
   }
 
+  // when user clicks save
   const save = async () => {
     try {
       if (toDo._id) {
@@ -53,13 +56,14 @@ function ToDo({ open, id, onClose }) {
     onClose(true);
   }
 
+  // render ToDo Drawer
   return (
     <Drawer
       anchor="right"
       open={open}
       onClose={cancel}
       SlideProps={{
-        sx: { width: '40vw' },
+        sx: { width: '60vw' },
       }}
     >
       <FormControl sx={{ margin: '16px', width: 'calc(100% - 32px)' }}>
@@ -81,9 +85,10 @@ function ToDo({ open, id, onClose }) {
   );
 }
 
+// PropType validation
 ToDo.propTypes = {
   open: PropTypes.bool,
-  id: PropTypes.string,
+  selectedItem: PropTypes.string,
   onClose: PropTypes.func.isRequired,
 };
 
