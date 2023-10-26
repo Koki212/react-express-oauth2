@@ -56,7 +56,7 @@ function Register() {
   // render register form
   return (
     <>
-      <CardContent>
+      <CardContent sx={{ width: '350px' }}>
         <Typography gutterBottom variant="h5">
           Sign Up
         </Typography>
