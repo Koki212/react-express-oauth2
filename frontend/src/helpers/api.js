@@ -1,30 +1,51 @@
-export default async function request(resource, method = 'GET', data = {}, authenticated = true) {
+import { isTokenValid } from "./token";
+
+export default async function request(
+  resource,
+  method = "GET",
+  data = {},
+  authenticated = true
+) {
   // check if frontend is running in dev mode
-  const isDev = window.location.port === '5173';
+  const isDev = window.location.port === "5173";
 
   // if frontend is running in dev mode, set localhost with different port as url, otherwise use the same url
   const url = isDev
     ? `http://localhost:3000/api${resource}`
     : `/api${resource}`;
 
+  // TODO: handle auth expired
+  let accessToken = localStorage.getItem("access_token");
+  if (authenticated) {
+    if (!isTokenValid) {
+      const tokens = await post(
+        "/auth/token",
+        {
+          refresh_token: localStorage.getItem("refresh_token"),
+          grant_type: "refresh_token",
+        },
+        false
+      );
+      localStorage.setItem("access_token", tokens.access_token);
+      accessToken = tokens.access_token;
+    }
+  }
+
   // add authentication header if request should be authenticated
   const headers = authenticated
     ? {
-      // TODO: add auth header
-    }
+        // TODO: add auth header
+        Authorization: `Bearer ${accessToken}`,
+      }
     : {};
 
   // add content type header for requests that contain a body
-  if (method !== 'GET') {
-    headers['Content-Type'] = 'application/json';
+  if (method !== "GET") {
+    headers["Content-Type"] = "application/json";
   }
 
   // add data stringified (if its not a GET request)
-  const body = method !== 'GET'
-    ? JSON.stringify(data)
-    : undefined;
-
-  // TODO: handle auth expired
+  const body = method !== "GET" ? JSON.stringify(data) : undefined;
 
   // send request
   const response = await fetch(url, {
@@ -44,18 +65,18 @@ export default async function request(resource, method = 'GET', data = {}, authe
 }
 
 export function get(resource, authenticated = true) {
-  return request(resource, 'GET', {}, authenticated);
+  return request(resource, "GET", {}, authenticated);
 }
 
 export function post(resource, data, authenticated = true) {
-  return request(resource, 'POST', data, authenticated);
+  return request(resource, "POST", data, authenticated);
 }
 
 export function put(resource, data, authenticated = true) {
-  return request(resource, 'PUT', data, authenticated);
+  return request(resource, "PUT", data, authenticated);
 }
 
 // we cannot name the function `delete` as it is a reserved word in javascript
 export function del(resource, data, authenticated = true) {
-  return request(resource, 'DELETE', data, authenticated);
+  return request(resource, "DELETE", data, authenticated);
 }
